@@ -367,7 +367,7 @@ class MainActivity : AppCompatActivity() {
                         textViewMoney.text = money.toString()
                     }
                 })
-//                inputword = ""
+                inputword = ""
 //                money = money + 100
 //                textViewMoney.text = money.toString()
 //                val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
