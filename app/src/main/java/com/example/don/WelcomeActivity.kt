@@ -87,7 +87,7 @@ class WelcomeActivity : AppCompatActivity() {
                 call.enqueue(object :retrofit2.Callback<Register>{
 
                     override fun onFailure(call: Call<Register>, t: Throwable) {
-                        Toast.makeText(this@WelcomeActivity, "註冊失敗耶！@@~", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@WelcomeActivity, "網路要開阿！XD~", Toast.LENGTH_LONG).show()
                     }
 
                     override fun onResponse(call: Call<Register>, response: Response<Register>) {
@@ -121,7 +121,7 @@ class WelcomeActivity : AppCompatActivity() {
                 call.enqueue(object :retrofit2.Callback<Login>{
 
                     override fun onFailure(call: Call<Login>, t: Throwable) {
-                        Toast.makeText(this@WelcomeActivity, "登入失敗耶！@@~", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@WelcomeActivity, "你是不是沒有連網路阿！@@~", Toast.LENGTH_LONG).show()
                     }
 
                     override fun onResponse(call: Call<Login>, response: Response<Login>) {
@@ -151,7 +151,7 @@ class WelcomeActivity : AppCompatActivity() {
 
                         }
                         else{
-                            Toast.makeText(this@WelcomeActivity, "登入失敗耶！@@~", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@WelcomeActivity, "401耶！@@~", Toast.LENGTH_LONG).show()
                         }
 
                     }

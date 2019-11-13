@@ -1,13 +1,15 @@
 package com.example.don
 
+import com.example.don.Bonus.Bonus
+import com.example.don.Bonus.Result
 import com.example.don.Buy.Buy
 import com.example.don.Login.Login
 import com.example.don.Register.Register
-import com.example.don.Shop.Magic
 import com.example.don.Shop.MagicString
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface APIInterface {
@@ -37,5 +39,11 @@ interface APIInterface {
         @Query("shop_id") buysShop_id:Int,
         @Query("magic_id") buyMagic_id:Int
     ):Call<Buy>
+
+    @PUT("bonus/")
+    fun bonus(
+        @Query("name") bonusName:String,
+        @Query("password") bonusPassword:String
+    ):Call<Bonus>
 
 }

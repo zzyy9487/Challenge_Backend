@@ -27,14 +27,16 @@
 
     <EditText
         android:id="@+id/editAccount"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="50dp"
         android:hint="@string/hintAccount"
-        android:textSize="33sp"
         android:textColor="@android:color/white"
+        android:textSize="33sp"
         app:layout_constraintBottom_toBottomOf="@id/textAccount"
-        app:layout_constraintStart_toEndOf="@id/textAccount"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/textAccount" />
 
     <TextView
         android:id="@+id/textPassword"
@@ -50,14 +52,16 @@
 
     <EditText
         android:id="@+id/editPassword"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginEnd="50dp"
         android:inputType="textPassword"
         android:hint="@string/hintPassword"
         android:textSize="33sp"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@id/textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/textPassword"/>
 
     <CheckBox
@@ -90,13 +94,13 @@
         android:id="@+id/btn_forgot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:backgroundTint="@color/canseeit"
         android:text="@string/forgot"
         android:textSize="25sp"
         android:textColor="@android:color/white"
         app:layout_constraintTop_toTopOf="@id/btn_registered"
-        app:layout_constraintStart_toEndOf="@id/btn_registered" />
+        app:layout_constraintStart_toEndOf="@id/btn_registered"
+        app:layout_constraintEnd_toStartOf="@+id/btn_login"/>
 
     <Button
         android:id="@+id/btn_login"
@@ -107,8 +111,8 @@
         android:text="@string/login"
         android:textSize="25sp"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toTopOf="@id/btn_forgot"
-        app:layout_constraintStart_toEndOf="@id/btn_forgot"  />
+        app:layout_constraintTop_toTopOf="@+id/btn_registered"
+        app:layout_constraintEnd_toEndOf="@+id/editAccount"  />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

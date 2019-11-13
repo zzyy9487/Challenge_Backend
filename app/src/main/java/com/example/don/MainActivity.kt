@@ -2,15 +2,17 @@ package com.example.don
 
 import android.content.Context
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
-import com.example.don.Shop.Magic
-import com.example.don.Shop.SQLiteHelper
+import com.example.don.Bonus.Bonus
+import com.example.don.Bonus.Result
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.textViewMoney
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
@@ -344,12 +346,32 @@ class MainActivity : AppCompatActivity() {
         imageKill.setOnClickListener {
             inputword = "$inputword" + "2"
             if (inputword.contains("1121122")){
-                Toast.makeText(this, "按這麼久才加100...QQ...", Toast.LENGTH_LONG).show()
-                inputword = ""
-                money = money + 100
-                textViewMoney.text = money.toString()
-                val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
-                preferenceBonus.edit().putString("cash", money.toString()).apply()
+//                Toast.makeText(this, "按這麼久才加100...QQ...", Toast.LENGTH_LONG).show()
+                var retrofitBonus = Retrofit.Builder()
+                    .baseUrl("http://vegelephant.club/api/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                var apiInterface = retrofitBonus.create(APIInterface::class.java)
+                var callBonus = apiInterface.bonus(name, password)
+
+                callBonus.enqueue(object :retrofit2.Callback<Bonus>{
+                    override fun onFailure(call: Call<Bonus>, t: Throwable) {
+                        Toast.makeText(this@MainActivity, "不要登入後偷偷關網路齁！", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onResponse(call: Call<Bonus>, response: Response<Bonus>) {
+                        val bonusdata = response.body()
+                        money = bonusdata!!.result.balance
+                        val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
+                        preferenceBonus.edit().putString("cash", money.toString()).apply()
+                        textViewMoney.text = money.toString()
+                    }
+                })
+//                inputword = ""
+//                money = money + 100
+//                textViewMoney.text = money.toString()
+//                val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
+//                preferenceBonus.edit().putString("cash", money.toString()).apply()
             }
             else if (inputword.length > 9){
                 var input = inputword.get(3).toString() + inputword.get(4).toString() + inputword.get(5).toString() + inputword.get(6).toString() + inputword.get(7).toString() + inputword.get(8).toString() + inputword.get(9).toString()
