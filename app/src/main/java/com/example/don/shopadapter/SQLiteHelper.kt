@@ -1,10 +1,13 @@
-package com.example.don.Shop
+package com.example.don.shopadapter
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class SQLiteHelper(context: Context): SQLiteOpenHelper(context, name, null, version) {
+class SQLiteHelper(context: Context): SQLiteOpenHelper(context,
+    name, null,
+    version
+) {
     companion object {
         private const val name = "sqLite.db" //資料庫名稱
         private const val version = 1 //資料庫版本

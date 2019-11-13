@@ -1,40 +1,24 @@
 package com.example.don
 
-import android.app.ProgressDialog.show
 import android.content.Context
-import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.don.Shop.Magic
+import com.example.don.shopadapter.Magic
 import kotlinx.android.synthetic.main.activity_shop.*
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.don.Buy.Buy
-import com.example.don.Magic.MagicL1Adapter
-import com.example.don.Magic.MagicL2Adapter
-import com.example.don.Magic.MagicL3Adapter
-import com.example.don.Shop.MagicString
-import com.example.don.Shop.ShopAdapter
-import com.example.don.Shop.SQLiteHelper
-import kotlinx.android.synthetic.main.activity_magic.*
+import com.example.don.buy.Buy
+import com.example.don.magic.MagicString
+import com.example.don.shopadapter.ShopAdapter
 import kotlinx.android.synthetic.main.activity_shop.textViewMoney
-import kotlinx.android.synthetic.main.alert_layout.*
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.random.Random
 
 class ShopActivity : AppCompatActivity() {
 
@@ -155,16 +139,25 @@ class ShopActivity : AppCompatActivity() {
         val apiInterface = retrofit.create(APIInterface::class.java)
         val call = apiInterface.getMagicList("$name", "$password")
 
-        call.enqueue(object :retrofit2.Callback<MutableList<MagicString?>>{
-            override fun onFailure(call: Call<MutableList<MagicString?>>, t: Throwable) {
+        call.enqueue(object :retrofit2.Callback<MagicString>{
+            override fun onFailure(call: Call<MagicString>, t: Throwable) {
             }
 
-            override fun onResponse(call: Call<MutableList<MagicString?>>, response: Response<MutableList<MagicString?>>) {
+            override fun onResponse(call: Call<MagicString>, response: Response<MagicString>) {
 
-                val list = response.body()
-                if (list != null) {
-                    for (i in 0 until list.size){
-                        shopList.add(i, Magic(list[i]!!.id, photoArray[i], list[i]!!.name, list[i]!!.price.toInt(), list[i]!!.level, list[i]!!.magic_id ?:0))
+                val shopResponse = response.body()
+                if (shopResponse != null) {
+                    for (i in 0 until shopResponse.magics.size){
+                        shopList.add(i,
+                            Magic(
+                                shopResponse.magics[i]!!.id,
+                                photoArray[i],
+                                shopResponse.magics[i]!!.name,
+                                shopResponse.magics[i]!!.price.toInt(),
+                                shopResponse.magics[i]!!.level,
+                                shopResponse.magics[i]!!.magic_id ?: 0
+                            )
+                        )
                     }
 
                     if (!shopList.isEmpty()){
@@ -172,13 +165,14 @@ class ShopActivity : AppCompatActivity() {
                     }
                     // recyclerView layoutManager&Adapter
                     fShopList.addAll(shopList.filter { it.level == page })
-                    var adapter = ShopAdapter(fShopList, this@ShopActivity)
+                    var adapter =
+                        ShopAdapter(fShopList, this@ShopActivity)
                     recyclerView.layoutManager = LinearLayoutManager(this@ShopActivity)
                     recyclerView.adapter = adapter
 
                     // interface
 
-                    adapter.setclickedListener(object :ShopAdapter.clickedListener{
+                    adapter.setclickedListener(object : ShopAdapter.clickedListener{
 
                         override fun showPurchase(img: Int, price: Int, position:Int) {
 
@@ -233,16 +227,25 @@ class ShopActivity : AppCompatActivity() {
                                             val apiInterfaceRe = retrofitRe.create(APIInterface::class.java)
                                             val callRenew = apiInterfaceRe.getMagicList("$name", "$password")
 
-                                            callRenew.enqueue(object :retrofit2.Callback<MutableList<MagicString?>>{
-                                                override fun onFailure(call: Call<MutableList<MagicString?>>, t: Throwable) {
+                                            callRenew.enqueue(object :retrofit2.Callback<MagicString>{
+                                                override fun onFailure(call: Call<MagicString>, t: Throwable) {
                                                 }
 
-                                                override fun onResponse(call: Call<MutableList<MagicString?>>, response: Response<MutableList<MagicString?>>) {
+                                                override fun onResponse(call: Call<MagicString>, response: Response<MagicString>) {
                                                     val list = response.body()
                                                     shopList.clear()
                                                     if (list != null) {
-                                                        for (i in 0 until list.size){
-                                                            shopList.add(i, Magic(list[i]!!.id, photoArray[i], list[i]!!.name, list[i]!!.price.toInt(), list[i]!!.level, list[i]!!.magic_id ?:0))
+                                                        for (i in 0 until list.magics.size){
+                                                            shopList.add(i,
+                                                                Magic(
+                                                                    list.magics[i]!!.id,
+                                                                    photoArray[i],
+                                                                    list.magics[i]!!.name,
+                                                                    list.magics[i]!!.price.toInt(),
+                                                                    list.magics[i]!!.level,
+                                                                    list.magics[i]!!.magic_id ?: 0
+                                                                )
+                                                            )
                                                         }
                                                         fShopList.clear()
                                                         fShopList.addAll(shopList.filter { it.level == page })

@@ -1,10 +1,10 @@
 package com.example.don
 
-import com.example.don.Bonus.Bonus
-import com.example.don.Buy.Buy
-import com.example.don.Login.Login
-import com.example.don.Register.Register
-import com.example.don.Shop.MagicString
+import com.example.don.bonus.Bonus
+import com.example.don.buy.Buy
+import com.example.don.login.Login
+import com.example.don.register.Register
+import com.example.don.magic.MagicString
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -16,7 +16,7 @@ interface APIInterface {
     fun getMagicList(
         @Query("name")  localname:String,
         @Query("password") localpassword:String
-    ): Call<MutableList<MagicString?>>
+    ): Call<MagicString>
 
     @POST("register")
     fun register(

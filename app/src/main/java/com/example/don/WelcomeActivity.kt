@@ -5,8 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.example.don.Login.Login
-import com.example.don.Register.Register
+import com.example.don.login.Login
+import com.example.don.register.Register
 import kotlinx.android.synthetic.main.activity_welcome.*
 import retrofit2.Call
 import retrofit2.Response
@@ -88,13 +88,13 @@ class WelcomeActivity : AppCompatActivity() {
                 call.enqueue(object :retrofit2.Callback<Register>{
 
                     override fun onFailure(call: Call<Register>, t: Throwable) {
-                        Toast.makeText(this@WelcomeActivity, "onFailure！", Toast.LENGTH_LONG).show()
+//                        Toast.makeText(this@WelcomeActivity, "onFailure！", Toast.LENGTH_LONG).show()
                     }
 
                     override fun onResponse(call: Call<Register>, response: Response<Register>) {
                         if(response.isSuccessful){
                                 val regdata = response.body()
-                                Toast.makeText(this@WelcomeActivity, "註冊名字是${regdata!!.user[0].name}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this@WelcomeActivity, "註冊名字是${regdata!!.user[0].balance}", Toast.LENGTH_LONG).show()
                                 editAccount.setText("")
                                 editPassword.setText("")
                         }

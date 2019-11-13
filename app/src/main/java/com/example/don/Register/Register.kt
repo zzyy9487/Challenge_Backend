@@ -1,4 +1,4 @@
-package com.example.don.Register
+package com.example.don.register
 
-data class Register(var result:String, var user:List<user>) {
+data class Register(var result:String, var user:MutableList<User>) {
 }

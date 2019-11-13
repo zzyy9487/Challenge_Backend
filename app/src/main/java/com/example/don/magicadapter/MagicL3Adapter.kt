@@ -1,4 +1,4 @@
-package com.example.don.Magic
+package com.example.don.magicadapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.don.R
-import com.example.don.Shop.Magic
+import com.example.don.shopadapter.Magic
 import kotlinx.android.synthetic.main.cell_magic_grid.view.*
 
-class MagicL1Adapter(var list:List<Magic>, val context: Context?):RecyclerView.Adapter<MagicL1Adapter.ViewHolder>() {
+class MagicL3Adapter(var list:List<Magic>, val context: Context?):RecyclerView.Adapter<MagicL3Adapter.ViewHolder>() {
 
 //    private var itemClickListener:clickedListener? = null
 //
@@ -42,11 +42,12 @@ class MagicL1Adapter(var list:List<Magic>, val context: Context?):RecyclerView.A
 
     inner class ViewHolder(itemView:View):RecyclerView.ViewHolder(itemView){
 
-        fun bindViewHolder(list:Magic){
+        fun bindViewHolder(list: Magic){
 
             itemView.imageViewGrid.setImageResource(list.photo)
             if (list.buy == 0){itemView.imageViewGrid.alpha = 0.2.toFloat()}
             else{itemView.imageViewGrid.alpha = 1.0.toFloat()}
+
 
         }
 

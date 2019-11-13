@@ -3,19 +3,17 @@ package com.example.don
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.don.Magic.MagicL1Adapter
-import com.example.don.Magic.MagicL2Adapter
-import com.example.don.Magic.MagicL3Adapter
-import com.example.don.Shop.Magic
+import com.example.don.magicadapter.MagicL1Adapter
+import com.example.don.magicadapter.MagicL2Adapter
+import com.example.don.magicadapter.MagicL3Adapter
+import com.example.don.shopadapter.Magic
 import kotlinx.android.synthetic.main.activity_magic.*
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.example.don.Shop.MagicString
-import kotlinx.android.synthetic.main.activity_welcome.*
+import com.example.don.magic.MagicString
 
 
 class MagicActivity : AppCompatActivity() {
@@ -101,16 +99,25 @@ class MagicActivity : AppCompatActivity() {
         val apiInterface = retrofit.create(APIInterface::class.java)
         val call = apiInterface.getMagicList("$name", "$password")
 
-        call.enqueue(object :retrofit2.Callback<MutableList<MagicString?>>{
-            override fun onFailure(call: Call<MutableList<MagicString?>>, t: Throwable) {
+        call.enqueue(object :retrofit2.Callback<MagicString>{
+            override fun onFailure(call: Call<MagicString>, t: Throwable) {
             }
 
-            override fun onResponse(call: Call<MutableList<MagicString?>>, response: Response<MutableList<MagicString?>>) {
+            override fun onResponse(call: Call<MagicString>, response: Response<MagicString>) {
 
-                val list = response.body()
-                if (list != null) {
-                    for (i in 0 until list.size){
-                        magicList.add(i, Magic(list[i]!!.id, photoArray[i], list[i]!!.name, list[i]!!.price.toInt(), list[i]!!.level, list[i]!!.magic_id ?:0))
+                val magicResponse = response.body()
+                if (magicResponse != null) {
+                    for (i in 0 until magicResponse.magics.size){
+                        magicList.add(i,
+                            Magic(
+                                magicResponse.magics[i]!!.id,
+                                photoArray[i],
+                                magicResponse.magics[i]!!.name,
+                                magicResponse.magics[i]!!.price.toInt(),
+                                magicResponse.magics[i]!!.level,
+                                magicResponse.magics[i]!!.magic_id ?: 0
+                            )
+                        )
                     }
 
                     inputL1List.addAll(magicList.filter { it.level == 1 })
@@ -121,9 +128,12 @@ class MagicActivity : AppCompatActivity() {
                     recyclerL2.layoutManager = GridLayoutManager(this@MagicActivity, 4)
                     recyclerL3.layoutManager = GridLayoutManager(this@MagicActivity, 4)
 
-                    val l1Adapter = MagicL1Adapter(inputL1List, this@MagicActivity)
-                    val l2Adapter = MagicL2Adapter(inputL2List, this@MagicActivity)
-                    val l3Adapter = MagicL3Adapter(inputL3List, this@MagicActivity)
+                    val l1Adapter =
+                        MagicL1Adapter(inputL1List, this@MagicActivity)
+                    val l2Adapter =
+                        MagicL2Adapter(inputL2List, this@MagicActivity)
+                    val l3Adapter =
+                        MagicL3Adapter(inputL3List, this@MagicActivity)
 
                     recyclerL1.adapter = l1Adapter
                     recyclerL2.adapter = l2Adapter

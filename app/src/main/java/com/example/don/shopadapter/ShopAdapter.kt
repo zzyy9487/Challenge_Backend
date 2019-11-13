@@ -1,4 +1,4 @@
-package com.example.don.Shop
+package com.example.don.shopadapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -18,13 +18,13 @@ class ShopAdapter(var list:List<Magic>, val context: Context?):RecyclerView.Adap
     var currentType = 1
 
     // 點擊監聽
-    private var itemClickListener:clickedListener? = null
+    private var itemClickListener: clickedListener? = null
 
     interface clickedListener{
         fun showPurchase(img:Int, price:Int, position: Int)
     }
 
-    fun setclickedListener(checkedListener:clickedListener){
+    fun setclickedListener(checkedListener: clickedListener){
         this.itemClickListener = checkedListener
     }
 
@@ -63,7 +63,7 @@ class ShopAdapter(var list:List<Magic>, val context: Context?):RecyclerView.Adap
     inner class ViewHolder(itemView:View, var viewType: Int):RecyclerView.ViewHolder(itemView){
 
 
-        fun bindViewHolder(list:Magic){
+        fun bindViewHolder(list: Magic){
 
             when(viewType){
                 viewType_Linear ->{

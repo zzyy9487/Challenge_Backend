@@ -1,4 +1,4 @@
-package com.example.don.Register
+package com.example.don.register
 
-data class user(var name:String, var balance:Int) {
+ class User(var name:String, var balance:Int) {
 }
