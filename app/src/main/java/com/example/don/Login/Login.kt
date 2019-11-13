@@ -1,4 +1,4 @@
 package com.example.don.Login
 
-data class Login(var name:String, var balance:Int) {
+data class Login(var result:String, var user:LoginUser) {
 }

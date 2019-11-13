@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.don.Bonus.Bonus
-import com.example.don.Bonus.Result
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.textViewMoney
 import retrofit2.Call
@@ -361,7 +360,7 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onResponse(call: Call<Bonus>, response: Response<Bonus>) {
                         val bonusdata = response.body()
-                        money = bonusdata!!.result.balance
+                        money = bonusdata!!.user.balance
                         val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
                         preferenceBonus.edit().putString("cash", money.toString()).apply()
                         textViewMoney.text = money.toString()

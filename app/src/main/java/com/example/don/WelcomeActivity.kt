@@ -77,23 +77,24 @@ class WelcomeActivity : AppCompatActivity() {
                 Toast.makeText(this, "帳號密碼都要輸入！", Toast.LENGTH_SHORT).show()
             }
             else{
-                var retrofit = Retrofit.Builder()
+                val retrofit = Retrofit.Builder()
                     .baseUrl("http://vegelephant.club/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
-                var apiInterface = retrofit.create(APIInterface::class.java)
-                var call = apiInterface.register("${editAccount.text}", "${editPassword.text}", 0)
+
+                val apiInterface = retrofit.create(APIInterface::class.java)
+                val call = apiInterface.register("${editAccount.text}", "${editPassword.text}", 0)
 
                 call.enqueue(object :retrofit2.Callback<Register>{
 
                     override fun onFailure(call: Call<Register>, t: Throwable) {
-                        Toast.makeText(this@WelcomeActivity, "網路要開阿！XD~", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@WelcomeActivity, "onFailure！", Toast.LENGTH_LONG).show()
                     }
 
                     override fun onResponse(call: Call<Register>, response: Response<Register>) {
                         if(response.isSuccessful){
-                                var regdata = response.body()
-                                Toast.makeText(this@WelcomeActivity, "註冊名字是${regdata!!.name}", Toast.LENGTH_LONG).show()
+                                val regdata = response.body()
+                                Toast.makeText(this@WelcomeActivity, "註冊名字是${regdata!!.user[0].name}", Toast.LENGTH_LONG).show()
                                 editAccount.setText("")
                                 editPassword.setText("")
                         }
@@ -113,7 +114,6 @@ class WelcomeActivity : AppCompatActivity() {
                 var retrofit = Retrofit.Builder()
                     .baseUrl("http://vegelephant.club/api/")
                     .addConverterFactory(GsonConverterFactory.create())
-
                     .build()
                 var apiInterface = retrofit.create(APIInterface::class.java)
                 var call = apiInterface.login("${editAccount.text}", "${editPassword.text}")
@@ -129,7 +129,7 @@ class WelcomeActivity : AppCompatActivity() {
                             var logindata = response.body()
 //                            Toast.makeText(this@WelcomeActivity, "餘額：${logindata!!.balance}", Toast.LENGTH_LONG).show()
                             val preferenceCash = getSharedPreferences("cash", Context.MODE_PRIVATE)
-                            preferenceCash.edit().putString("cash", logindata!!.balance.toString()).apply()
+                            preferenceCash.edit().putString("cash", logindata!!.user.balance.toString()).apply()
                             if (check=="1"){
                                 val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
                                 preferenceName.edit().putString("name", editAccount.text.toString()).apply()
@@ -151,7 +151,12 @@ class WelcomeActivity : AppCompatActivity() {
 
                         }
                         else{
-                            Toast.makeText(this@WelcomeActivity, "401耶！@@~", Toast.LENGTH_LONG).show()
+                            if (response.code() == 401){
+                            Toast.makeText(this@WelcomeActivity, "name or password error.", Toast.LENGTH_LONG).show()
+                            }
+                            else if(response.code() == 406){
+                                Toast.makeText(this@WelcomeActivity, "The password field is required.", Toast.LENGTH_LONG).show()
+                            }
                         }
 
                     }
