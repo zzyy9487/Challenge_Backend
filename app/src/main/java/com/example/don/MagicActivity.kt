@@ -15,13 +15,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.don.magic.MagicString
 
-
 class MagicActivity : AppCompatActivity() {
 
     var magicList = mutableListOf<Magic>()
     var inputL1List = mutableListOf<Magic>()
     var inputL2List = mutableListOf<Magic>()
     var inputL3List = mutableListOf<Magic>()
+    lateinit var shared :SharedPreferences
 
     var photoArray = arrayOf(
         R.drawable.m0,
@@ -69,28 +69,22 @@ class MagicActivity : AppCompatActivity() {
     lateinit var name :String
     lateinit var password:String
     fun record(){
-        val preferenceCheck = getSharedPreferences("check", Context.MODE_PRIVATE)
-        check = preferenceCheck.getString("check","")?:0.toString()
+        check = shared.preference.getString("check", "")?:0.toString()
         if (check == 1.toString()){
-            val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
-            name = preferenceName.getString("name", "")?:""
-            val preferencePassword = getSharedPreferences("password", Context.MODE_PRIVATE)
-            password = preferencePassword.getString("password", "")?:""
+            name = shared.preference.getString("name", "")?:""
+            password =shared.preference.getString("password", "")?:""
         }
         else{
-            val preferenceName = getSharedPreferences("name2", Context.MODE_PRIVATE)
-            name = preferenceName.getString("name2", "")?:""
-            val preferencePassword = getSharedPreferences("password2", Context.MODE_PRIVATE)
-            password = preferencePassword.getString("password2", "")?:""
+            name = shared.preference.getString("name2", "")?:""
+            password =shared.preference.getString("password2", "")?:""
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_magic)
-
-
-       record()
+        shared = SharedPreferences(this)
+        record()
 
         val retrofit = Retrofit.Builder()
             .baseUrl("http://vegelephant.club/api/")
@@ -102,9 +96,7 @@ class MagicActivity : AppCompatActivity() {
         call.enqueue(object :retrofit2.Callback<MagicString>{
             override fun onFailure(call: Call<MagicString>, t: Throwable) {
             }
-
             override fun onResponse(call: Call<MagicString>, response: Response<MagicString>) {
-
                 val magicResponse = response.body()
                 if (magicResponse != null) {
                     for (i in 0 until magicResponse.magics.size){
@@ -119,31 +111,21 @@ class MagicActivity : AppCompatActivity() {
                             )
                         )
                     }
-
                     inputL1List.addAll(magicList.filter { it.level == 1 })
                     inputL2List.addAll(magicList.filter { it.level == 2 })
                     inputL3List.addAll(magicList.filter { it.level == 3 })
-
                     recyclerL1.layoutManager = GridLayoutManager(this@MagicActivity, 4)
                     recyclerL2.layoutManager = GridLayoutManager(this@MagicActivity, 4)
                     recyclerL3.layoutManager = GridLayoutManager(this@MagicActivity, 4)
-
-                    val l1Adapter =
-                        MagicL1Adapter(inputL1List, this@MagicActivity)
-                    val l2Adapter =
-                        MagicL2Adapter(inputL2List, this@MagicActivity)
-                    val l3Adapter =
-                        MagicL3Adapter(inputL3List, this@MagicActivity)
-
+                    val l1Adapter = MagicL1Adapter(inputL1List, this@MagicActivity)
+                    val l2Adapter = MagicL2Adapter(inputL2List, this@MagicActivity)
+                    val l3Adapter = MagicL3Adapter(inputL3List, this@MagicActivity)
                     recyclerL1.adapter = l1Adapter
                     recyclerL2.adapter = l2Adapter
                     recyclerL3.adapter = l3Adapter
-
                 }
             }
         })
-
-
 
 //        var sqliteDB = SQLiteHelper(this).writableDatabase
 //        val DB = sqliteDB.rawQuery("SELECT * FROM donTable", null)

@@ -26,6 +26,7 @@ class ShopActivity : AppCompatActivity() {
     var fShopList = mutableListOf<Magic>()
     var money:Int = 0
     var page :Int = 1
+    lateinit var shared :SharedPreferences
 
     lateinit var textPrice :TextView
     lateinit var imageView :ImageView
@@ -39,19 +40,14 @@ class ShopActivity : AppCompatActivity() {
     lateinit var name :String
     lateinit var password:String
     fun record(){
-        val preferenceCheck = getSharedPreferences("check", Context.MODE_PRIVATE)
-        check = preferenceCheck.getString("check","")?:0.toString()
+        check = shared.preference.getString("check", "")?:0.toString()
         if (check == 1.toString()){
-            val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
-            name = preferenceName.getString("name", "")?:""
-            val preferencePassword = getSharedPreferences("password", Context.MODE_PRIVATE)
-            password = preferencePassword.getString("password", "")?:""
+            name = shared.preference.getString("name", "")?:""
+            password =shared.preference.getString("password", "")?:""
         }
         else{
-            val preferenceName = getSharedPreferences("name2", Context.MODE_PRIVATE)
-            name = preferenceName.getString("name2", "")?:""
-            val preferencePassword = getSharedPreferences("password2", Context.MODE_PRIVATE)
-            password = preferencePassword.getString("password2", "")?:""
+            name = shared.preference.getString("name2", "")?:""
+            password =shared.preference.getString("password2", "")?:""
         }
     }
 
@@ -98,8 +94,7 @@ class ShopActivity : AppCompatActivity() {
     )
 
     fun callMoney(){
-        val preference = getSharedPreferences("cash", Context.MODE_PRIVATE)
-        val cash = preference.getString("cash", "")
+        val cash = shared.preference.getString("cash", "")
         if (cash.isNullOrEmpty()){
             money = 0
         }
@@ -111,7 +106,7 @@ class ShopActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop)
-
+        shared = SharedPreferences(this)
         // SQLite
 //        var sqliteDB = SQLiteHelper(this).writableDatabase
 //
@@ -181,7 +176,6 @@ class ShopActivity : AppCompatActivity() {
                             val builder = AlertDialog.Builder(adapter.context!!)
                                 .setView(view)
                                 .show()
-
                             imageView = view.findViewById(R.id.imagePurchase)
                             textPrice = view.findViewById(R.id.textPurchasePrice)
                             pos = view.findViewById(R.id.textPurchaseBuy)
@@ -199,7 +193,6 @@ class ShopActivity : AppCompatActivity() {
 //                                for (i in 0 until shopList.size){
 //                                    sqliteDB.execSQL("INSERT INTO donTable(id, photo, name, price, level, magic_id) VALUES(?, ?, ?, ?, ?, ?)", arrayOf<Any?>(i, shopList[i].photo, shopList[i].name, shopList[i].price, shopList[i].level, shopList[i].buy))
 //                                }
-
                                     val shopid = 1
                                     val retrofitBuy = Retrofit.Builder()
                                         .baseUrl("http://vegelephant.club/api/")
@@ -209,17 +202,15 @@ class ShopActivity : AppCompatActivity() {
                                     val callBuy = apiInterfaceBuy.buy("$name", "$password", shopid, position)
 
                                     callBuy.enqueue(object :retrofit2.Callback<Buy>{
-
                                         override fun onFailure(call: Call<Buy>, t: Throwable) {
                                         }
-
                                         override fun onResponse(call: Call<Buy>, response: Response<Buy>) {
                                             val buydata = response.body()
-                                            val preferenceBuy = getSharedPreferences("cash", Context.MODE_PRIVATE)
-                                            preferenceBuy.edit().putString("cash", buydata!!.user.balance.toString()).apply()
+                                            shared.setCash(buydata!!.user.balance.toString())
+//                                            val preferenceBuy = getSharedPreferences("cash", Context.MODE_PRIVATE)
+//                                            preferenceBuy.edit().putString("cash", buydata!!.user.balance.toString()).apply()
                                             money = buydata!!.user.balance
                                             textViewMoney.text = money.toString()
-
                                             val retrofitRe = Retrofit.Builder()
                                                 .baseUrl("http://vegelephant.club/api/")
                                                 .addConverterFactory(GsonConverterFactory.create())
@@ -230,7 +221,6 @@ class ShopActivity : AppCompatActivity() {
                                             callRenew.enqueue(object :retrofit2.Callback<MagicString>{
                                                 override fun onFailure(call: Call<MagicString>, t: Throwable) {
                                                 }
-
                                                 override fun onResponse(call: Call<MagicString>, response: Response<MagicString>) {
                                                     val list = response.body()
                                                     shopList.clear()
@@ -247,14 +237,10 @@ class ShopActivity : AppCompatActivity() {
                                                                 )
                                                             )
                                                         }
-                                                        fShopList.clear()
-                                                        fShopList.addAll(shopList.filter { it.level == page })
-                                                        adapter.notifyDataSetChanged()
+                                                        filterLevel(adapter)
                                                     }
                                                 }
                                             })
-
-
                                         }
                                     })
 
@@ -327,23 +313,17 @@ class ShopActivity : AppCompatActivity() {
 
                     textViewL1.setOnClickListener {
                         page = 1
-                        fShopList.clear()
-                        fShopList.addAll(shopList.filter { it.level == page })
-                        adapter.notifyDataSetChanged()
+                        filterLevel(adapter)
                     }
 
                     textViewL2.setOnClickListener {
                         page = 2
-                        fShopList.clear()
-                        fShopList.addAll(shopList.filter { it.level == page })
-                        adapter.notifyDataSetChanged()
+                        filterLevel(adapter)
                     }
 
                     textViewL3.setOnClickListener {
                         page = 3
-                        fShopList.clear()
-                        fShopList.addAll(shopList.filter { it.level == page })
-                        adapter.notifyDataSetChanged()
+                        filterLevel(adapter)
                     }
 
                     imageViewList1.setOnClickListener {
@@ -366,47 +346,20 @@ class ShopActivity : AppCompatActivity() {
 //                        val preferenceMinus = getSharedPreferences("cash", Context.MODE_PRIVATE)
 //                        preferenceMinus.edit().putString("cash", money.toString()).apply()
 //                    }
-
                 }
-
-
             }
         })
-
     }
 
+    private fun filterLevel(adapter: ShopAdapter) {
+        fShopList.clear()
+        fShopList.addAll(shopList.filter { it.level == page })
+        adapter.notifyDataSetChanged()
+    }
+
+    // 返回鍵
     override fun onBackPressed() {
         super.onBackPressed()
         this.finish()
     }
-
-    // 返回鍵監聽
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        if(purchaseLayout.isVisible){
-//            textPurchaseBuy.visibility = View.VISIBLE
-//            textPurachseCancel.visibility = View.VISIBLE
-//            textPurachseBye.visibility = View.GONE
-//            purchaseLayout.visibility = View.GONE
-//        }
-//        else{
-//        }
-//    }
-
-//    override fun onBackPressed() {
-//        if(purchaseLayout.isVisible){
-//            textPurchaseBuy.visibility = View.VISIBLE
-//            textPurachseCancel.visibility = View.VISIBLE
-//            textPurachseBye.visibility = View.GONE
-//            purchaseLayout.visibility = View.GONE
-//        }
-//        else{
-//            val intent = Intent(this, MainActivity::class.java)
-//            startActivity(intent)
-//            this@ShopActivity.finish()
-//        }
-//    }
-
-
 }

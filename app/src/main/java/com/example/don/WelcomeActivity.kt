@@ -12,34 +12,30 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 class WelcomeActivity : AppCompatActivity() {
 
     var check :String = "0"
+    lateinit var shared :SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
-
-        val preferenceInit = getSharedPreferences("name", Context.MODE_PRIVATE)
-        if (preferenceInit.getString("name","").isNullOrEmpty()){
+        shared = SharedPreferences(this)
+        if(shared.preference.getString("name", "").isNullOrEmpty()){
         }
         else{
-            Thread{
-                Thread.sleep(0)
-                runOnUiThread {
-                    startActivity(Intent(this, MainActivity::class.java))
-                }
-            }.start()
+            editAccount.setText(shared.preference.getString("name", ""))
+            editPassword.setText(shared.preference.getString("password", ""))
         }
 
         fun getCheckStatus(){
-            val preferenceCheck = getSharedPreferences("check", Context.MODE_PRIVATE)
-            if (preferenceCheck.getString("check", "").isNullOrEmpty()){
+            if (shared.preference.getString("check", "").isNullOrEmpty()){
                 check = "0"
                 checkRecord.isChecked = false
             }
-            else if (preferenceCheck.getString("check", "") == 0.toString()){
+            else if (shared.preference.getString("check", "") == 0.toString()){
                 check = "0"
                 checkRecord.isChecked = false
             }
@@ -51,19 +47,16 @@ class WelcomeActivity : AppCompatActivity() {
         getCheckStatus()
 
         checkRecord.setOnClickListener{
-            val preferenceCheck = getSharedPreferences("check", Context.MODE_PRIVATE)
             if (checkRecord.isChecked){
                 check = "1"
-                preferenceCheck.edit().putString("check", "1").apply()
-                val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
-                preferenceName.edit().putString("name", "").apply()
-                val preferencePassword = getSharedPreferences("password", Context.MODE_PRIVATE)
-                preferencePassword.edit().putString("password", "").apply()
+                shared.setCheck("1")
+                shared.setName("")
+                shared.setPassword("")
             }
             else{
                 checkRecord.isChecked = false
                 check = "0"
-                preferenceCheck.edit().putString("check", "0").apply()
+                shared.setCheck("0")
             }
         }
 
@@ -81,20 +74,17 @@ class WelcomeActivity : AppCompatActivity() {
                     .baseUrl("http://vegelephant.club/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
-
                 val apiInterface = retrofit.create(APIInterface::class.java)
                 val call = apiInterface.register("${editAccount.text}", "${editPassword.text}", 0)
 
                 call.enqueue(object :retrofit2.Callback<Register>{
-
                     override fun onFailure(call: Call<Register>, t: Throwable) {
-//                        Toast.makeText(this@WelcomeActivity, "onFailure！", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@WelcomeActivity, "$t", Toast.LENGTH_LONG).show()
                     }
-
                     override fun onResponse(call: Call<Register>, response: Response<Register>) {
                         if(response.isSuccessful){
                                 val regdata = response.body()
-                                Toast.makeText(this@WelcomeActivity, "註冊名字是${regdata!!.user[0].balance}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this@WelcomeActivity, "您已成功註冊帳號： ${regdata!!.user.name} " , Toast.LENGTH_LONG).show()
                                 editAccount.setText("")
                                 editPassword.setText("")
                         }
@@ -115,40 +105,32 @@ class WelcomeActivity : AppCompatActivity() {
                     .baseUrl("http://vegelephant.club/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
+//                    .create<APIInterface>().login("${editAccount.text}", "${editPassword.text}")
                 var apiInterface = retrofit.create(APIInterface::class.java)
                 var call = apiInterface.login("${editAccount.text}", "${editPassword.text}")
 
                 call.enqueue(object :retrofit2.Callback<Login>{
-
                     override fun onFailure(call: Call<Login>, t: Throwable) {
                         Toast.makeText(this@WelcomeActivity, "你是不是沒有連網路阿！@@~", Toast.LENGTH_LONG).show()
                     }
-
                     override fun onResponse(call: Call<Login>, response: Response<Login>) {
                         if (response.isSuccessful){
                             var logindata = response.body()
-//                            Toast.makeText(this@WelcomeActivity, "餘額：${logindata!!.balance}", Toast.LENGTH_LONG).show()
-                            val preferenceCash = getSharedPreferences("cash", Context.MODE_PRIVATE)
-                            preferenceCash.edit().putString("cash", logindata!!.user.balance.toString()).apply()
+                            shared.setCash(logindata!!.user.balance.toString())
                             if (check=="1"){
-                                val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
-                                preferenceName.edit().putString("name", editAccount.text.toString()).apply()
-                                val preferencePassword = getSharedPreferences("password", Context.MODE_PRIVATE)
-                                preferencePassword.edit().putString("password", editPassword.text.toString()).apply()
+                                shared.setName(editAccount.text.toString())
+                                shared.setPassword(editPassword.text.toString())
                                 editAccount.setText("")
                                 editPassword.setText("")
                                 val intent = Intent(this@WelcomeActivity, MainActivity::class.java)
                                 startActivity(intent)
                             }
                             else{
-                                val preferenceName = getSharedPreferences("name2", Context.MODE_PRIVATE)
-                                preferenceName.edit().putString("name2", editAccount.text.toString()).apply()
-                                val preferencePassword = getSharedPreferences("password2", Context.MODE_PRIVATE)
-                                preferencePassword.edit().putString("password2", editPassword.text.toString()).apply()
+                                shared.setName2(editAccount.text.toString())
+                                shared.setPassword2(editPassword.text.toString())
                                 val intent = Intent(this@WelcomeActivity, MainActivity::class.java)
                                 startActivity(intent)
                             }
-
                         }
                         else{
                             if (response.code() == 401){
@@ -158,11 +140,9 @@ class WelcomeActivity : AppCompatActivity() {
                                 Toast.makeText(this@WelcomeActivity, "The password field is required.", Toast.LENGTH_LONG).show()
                             }
                         }
-
                     }
                 })
             }
         }
-
     }
 }

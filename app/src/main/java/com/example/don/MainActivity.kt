@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 //    lateinit var sqliteDB:SQLiteDatabase
 //    var initList = mutableListOf<Magic>()
     var money :Int = 0
+    lateinit var shared :SharedPreferences
 
 //    var photoArray = arrayOf(
 //        R.drawable.m0,
@@ -226,8 +227,10 @@ class MainActivity : AppCompatActivity() {
 //        }
 
 //          local Money
-        val preference = getSharedPreferences("cash", Context.MODE_PRIVATE)
-        val cash = preference.getString("cash", "")
+//        val preference = getSharedPreferences("cash", Context.MODE_PRIVATE)
+//        val cash = preference.getString("cash", "")
+        shared = SharedPreferences(this)
+        val cash = shared.preference.getString("cash", "")
         if (cash.isNullOrEmpty()){
             money = 0
         }
@@ -236,24 +239,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     lateinit var check:String
     lateinit var name :String
     lateinit var password:String
     fun record(){
-        val preferenceCheck = getSharedPreferences("check", Context.MODE_PRIVATE)
-        check = preferenceCheck.getString("check","")?:0.toString()
+//        val preferenceCheck = getSharedPreferences("check", Context.MODE_PRIVATE)
+//        check = preferenceCheck.getString("check","")?:0.toString()
+        check = shared.preference.getString("check", "")?:0.toString()
         if (check == 1.toString()){
-            val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
-            name = preferenceName.getString("name", "")?:""
-            val preferencePassword = getSharedPreferences("password", Context.MODE_PRIVATE)
-            password = preferencePassword.getString("password", "")?:""
+            name = shared.preference.getString("name", "")?:""
+            password = shared.preference.getString("password", "")?:""
+//            val preferenceName = getSharedPreferences("name", Context.MODE_PRIVATE)
+//            name = preferenceName.getString("name", "")?:""
+//            val preferencePassword = getSharedPreferences("password", Context.MODE_PRIVATE)
+//            password = preferencePassword.getString("password", "")?:""
         }
         else{
-            val preferenceName = getSharedPreferences("name2", Context.MODE_PRIVATE)
-            name = preferenceName.getString("name2", "")?:""
-            val preferencePassword = getSharedPreferences("password2", Context.MODE_PRIVATE)
-            password = preferencePassword.getString("password2", "")?:""
+            name = shared.preference.getString("name2", "")?:""
+            password = shared.preference.getString("password2", "")?:""
+//            val preferenceName = getSharedPreferences("name2", Context.MODE_PRIVATE)
+//            name = preferenceName.getString("name2", "")?:""
+//            val preferencePassword = getSharedPreferences("password2", Context.MODE_PRIVATE)
+//            password = preferencePassword.getString("password2", "")?:""
         }
     }
 
@@ -282,18 +289,24 @@ class MainActivity : AppCompatActivity() {
         textViewName.text = "島主"+"$name"
 
         imageViewName.setOnClickListener {
-            val preference1 = getSharedPreferences("cash", Context.MODE_PRIVATE)
-            preference1.edit().putString("cash", "0").apply()
-            val preference2 = getSharedPreferences("name", Context.MODE_PRIVATE)
-            preference2.edit().putString("name", "").apply()
-            val preference3 = getSharedPreferences("password", Context.MODE_PRIVATE)
-            preference3.edit().putString("password", "").apply()
-            val preference4 = getSharedPreferences("check", Context.MODE_PRIVATE)
-            preference4.edit().putString("check", "0").apply()
-            val preference5 = getSharedPreferences("name2", Context.MODE_PRIVATE)
-            preference5.edit().putString("name2", "").apply()
-            val preference6 = getSharedPreferences("password2", Context.MODE_PRIVATE)
-            preference6.edit().putString("password2", "").apply()
+            shared.setCash("0")
+            shared.setCheck("0")
+            shared.setName("")
+            shared.setPassword("")
+            shared.setName2("")
+            shared.setPassword2("")
+//            val preference1 = getSharedPreferences("cash", Context.MODE_PRIVATE)
+//            preference1.edit().putString("cash", "0").apply()
+//            val preference2 = getSharedPreferences("name", Context.MODE_PRIVATE)
+//            preference2.edit().putString("name", "").apply()
+//            val preference3 = getSharedPreferences("password", Context.MODE_PRIVATE)
+//            preference3.edit().putString("password", "").apply()
+//            val preference4 = getSharedPreferences("check", Context.MODE_PRIVATE)
+//            preference4.edit().putString("check", "0").apply()
+//            val preference5 = getSharedPreferences("name2", Context.MODE_PRIVATE)
+//            preference5.edit().putString("name2", "").apply()
+//            val preference6 = getSharedPreferences("password2", Context.MODE_PRIVATE)
+//            preference6.edit().putString("password2", "").apply()
             val intent = Intent(this@MainActivity, WelcomeActivity::class.java)
             startActivity(intent)
             this@MainActivity.finish()
@@ -337,7 +350,7 @@ class MainActivity : AppCompatActivity() {
         imageBug.setOnClickListener {
             inputword = "$inputword" + "1"
             if(inputword.length > 9){
-                var input = inputword.get(3).toString() + inputword.get(4).toString() + inputword.get(5).toString() + inputword.get(6).toString() + inputword.get(7).toString() + inputword.get(8).toString() + inputword.get(9).toString()
+                val input = inputword.get(3).toString() + inputword.get(4).toString() + inputword.get(5).toString() + inputword.get(6).toString() + inputword.get(7).toString() + inputword.get(8).toString() + inputword.get(9).toString()
                 inputword = input
             }
         }
@@ -345,13 +358,12 @@ class MainActivity : AppCompatActivity() {
         imageKill.setOnClickListener {
             inputword = "$inputword" + "2"
             if (inputword.contains("1121122")){
-//                Toast.makeText(this, "按這麼久才加100...QQ...", Toast.LENGTH_LONG).show()
-                var retrofitBonus = Retrofit.Builder()
+                val retrofitBonus = Retrofit.Builder()
                     .baseUrl("http://vegelephant.club/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
-                var apiInterface = retrofitBonus.create(APIInterface::class.java)
-                var callBonus = apiInterface.bonus(name, password)
+                val apiInterface = retrofitBonus.create(APIInterface::class.java)
+                val callBonus = apiInterface.bonus(name, password)
 
                 callBonus.enqueue(object :retrofit2.Callback<Bonus>{
                     override fun onFailure(call: Call<Bonus>, t: Throwable) {
@@ -361,8 +373,9 @@ class MainActivity : AppCompatActivity() {
                     override fun onResponse(call: Call<Bonus>, response: Response<Bonus>) {
                         val bonusdata = response.body()
                         money = bonusdata!!.user.balance
-                        val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
-                        preferenceBonus.edit().putString("cash", money.toString()).apply()
+                        shared.setCash(money.toString())
+//                        val preferenceBonus = getSharedPreferences("cash", Context.MODE_PRIVATE)
+//                        preferenceBonus.edit().putString("cash", money.toString()).apply()
                         textViewMoney.text = money.toString()
                     }
                 })
@@ -398,8 +411,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val preference = getSharedPreferences("cash", Context.MODE_PRIVATE)
-        val cash = preference.getString("cash", "")
+        val cash = shared.preference.getString("cash", "")
+//        val preference = getSharedPreferences("cash", Context.MODE_PRIVATE)
+//        val cash = preference.getString("cash", "")
         if (cash.isNullOrEmpty()){
             money = 0
         }

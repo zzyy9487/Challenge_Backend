@@ -45,4 +45,11 @@ interface APIInterface {
         @Query("password") bonusPassword:String
     ):Call<Bonus>
 
+    @POST("register")
+    fun register2(
+        @Query("name") regName:String,
+        @Query("password") regPassword:String,
+        @Query("role") regRole:Int
+    ):Call<Register>
+
 }
